@@ -55,7 +55,6 @@ export default function App() {
   const [preparingExport, setPreparingExport] = useState(false);
   const downloadedJobs = useRef(new Set<string>());
   const usageDialog = useRef<HTMLDialogElement>(null);
-  const [exportSize, setExportSize] = useState('1080');
   const [exportFormat, setExportFormat] = useState<ExportFormat>('mp4');
   const [zoom, setZoom] = useState(100);
   const [dirty, setDirty] = useState(false);
@@ -296,12 +295,12 @@ export default function App() {
     setPreparingExport(true);
     try {
       const exportProject = await prepareExportProject(project);
-      const response = await fetch('/api/exports', {method: 'POST', headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({project: exportProject, size: Number(exportSize), format: exportFormat})});
+      const response = await fetch('./api/exports', {method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({project: exportProject, format: exportFormat})});
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || '导出提交失败');
       setJob(result);
-      setMessage(`正在本机生成 ${exportFormat.toUpperCase()}，本次导出使用提交时的项目。`);
+      setMessage(`正在生成 ${exportFormat.toUpperCase()}，本次导出使用提交时的项目。`);
     } finally {setPreparingExport(false);}
   });
 
@@ -311,8 +310,8 @@ export default function App() {
     let timer: ReturnType<typeof setTimeout>;
     const poll = async () => {
       try {
-        const response = await fetch(`/api/exports/${job.id}`, {signal: controller.signal});
-        if (!response.ok) throw new Error('无法查询导出进度，请确认本地服务仍在运行');
+        const response = await fetch(`./api/exports/${job.id}`, {signal: controller.signal});
+        if (!response.ok) throw new Error('无法查询导出进度，请确认服务仍在运行');
         const next: ExportJob = await response.json();
         setJob(next);
         if (['queued', 'rendering', 'encoding'].includes(next.status)) timer = setTimeout(poll, 700);
@@ -328,7 +327,7 @@ export default function App() {
     if (!job || job.status !== 'done' || downloadedJobs.current.has(job.id)) return;
     downloadedJobs.current.add(job.id);
     const link = document.createElement('a');
-    link.href = `/api/exports/${job.id}/download`;
+    link.href = `./api/exports/${job.id}/download`;
     link.download = `region-motion.${job.format}`;
     document.body.append(link);
     link.click();
@@ -361,7 +360,7 @@ export default function App() {
   return <div className="app-shell">
     <header className="topbar">
       <div className="brand"><span className="brand-mark">r<span>m</span></span><div><strong>Region Motion</strong><small>图片框选与动画工作台</small></div></div>
-      <span className="local-badge">本地处理 · 无需 AI Key</span>
+      <span className="local-badge">图片动画 · 无需 AI Key</span>
       <div className="header-actions">
         <button onClick={() => usageDialog.current?.showModal()}>使用说明</button>
         <button disabled={!!busy} onClick={() => projectInput.current?.click()}>打开项目</button>
@@ -370,7 +369,7 @@ export default function App() {
           catch (error) {setError((error as Error).message);}
         }}>保存项目{dirty ? ' ·' : ''}</button>
         <select className="header-format" aria-label="导出格式" value={exportFormat} disabled={exporting || !!busy}
-          onChange={(event) => {const format = event.target.value as ExportFormat; setExportFormat(format); setExportSize(format === 'gif' ? '720' : '1080');}}>
+          onChange={(event) => setExportFormat(event.target.value as ExportFormat)}>
           <option value="mp4">MP4</option><option value="gif">GIF</option></select>
         <button className="primary header-export" disabled={!!busy || exporting || !project.scenes.length} onClick={startExport}
           aria-live="polite" title={`导出 ${exportFormat.toUpperCase()}`}>
@@ -440,10 +439,10 @@ export default function App() {
         {job ? <div className="export-status" aria-live="polite"><span>{({queued: '准备导出', rendering: '渲染画面', encoding: '编码视频', done: '导出完成', error: '导出失败', cancelled: '已取消'})[job.status]}</span>
           <progress max="100" value={job.progress} /><span>{Math.round(job.progress)}%</span>
           {exporting ? <button onClick={() => void run('正在取消…', async () => {
-            const response = await fetch(`/api/exports/${job.id}`, {method: 'DELETE'});
+            const response = await fetch(`./api/exports/${job.id}`, {method: 'DELETE'});
             const result = await response.json(); if (!response.ok) throw new Error(result.error); setJob(result);
           })}>取消</button> : null}
-          {job.status === 'done' ? <><span>已自动触发下载</span><a href={`/api/exports/${job.id}/download`} download={`region-motion.${job.format}`}>重新下载</a></> : null}
+          {job.status === 'done' ? <><span>已自动触发下载</span><a href={`./api/exports/${job.id}/download`} download={`region-motion.${job.format}`}>重新下载</a></> : null}
           {job.error ? <span className="error-text">{job.error}</span> : null}
         </div> : null}
       </main>
@@ -487,8 +486,8 @@ export default function App() {
             <button className="danger" onClick={() => {edit({...project, scenes: arrangeScenes(project.scenes.filter((item) => item.id !== scene.id))}); setSelectedSceneId(''); setSelectedRegionId('');}}>删除当前画面</button>
           </section> : null}
         </fieldset>
-        <section className="export-options"><h3>视频导出</h3><label>长边分辨率<select value={exportSize} disabled={exporting} onChange={(event) => setExportSize(event.target.value)}><option value="720">720 px · 快速</option><option value="1080">1080 px · 标准</option><option value="1920">1920 px · 高清</option></select></label>
-          <p>{exportFormat === 'gif' ? 'GIF · 15 fps · 循环播放，建议使用 720 px。' : 'MP4 · 30 fps · 无声音轨。'}保留区域动画与转场，画幅跟随第一张图片。</p></section>
+        <section className="export-options"><h3>视频导出</h3>
+          <p>{exportFormat === 'gif' ? 'GIF · 15 fps · 循环播放。' : 'MP4 · 30 fps · 无声音轨。'}固定高清 1920 px 长边，保留区域动画与转场，画幅跟随第一张图片。</p></section>
       </aside>
     </div>
     <dialog ref={usageDialog} className="usage-dialog">

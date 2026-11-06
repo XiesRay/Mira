@@ -1,18 +1,27 @@
 # Region Motion
 
-把一张图片里的内容，按顺序变成动画。
+Turn the contents of an image into an animation, one region at a time.
 
-上传图片后自动框选，再手动调整边界、拖动出现顺序、预览播放，最后导出 MP4 或 GIF。所有处理都在本机完成，不需要 AI Key、账号或云端服务。也可以把整个目录安装成 Codex skill，用 `$region-motion` 打开工作台。
+Upload an image, detect regions automatically, refine their boundaries, arrange their order, preview the animation, and export an MP4 or GIF. The local version sends images only to the service on your own computer. The hosted version sends images to the deployed server for region detection and export. Neither version requires an AI key. You can also install this repository as a Codex skill and open the local workspace with `$region-motion`.
 
-## 快速启动
+- Hosted app: [https://www.jhstore.cn/region-motion/](https://www.jhstore.cn/region-motion/)
+- Mirami workbench: [https://www.jhstore.cn/pc/workbench/studio/](https://www.jhstore.cn/pc/workbench/studio/)
 
-在 macOS 或 Linux 上准备好：
+## Exported demo
 
-- Python 3.11 或更新版本。
-- Node.js 22 或更新版本，以及 npm。
-- FFmpeg，可通过 PATH 找到，或通过 `FFMPEG_PATH` 指定路径。
+![Region Motion exported animation](docs/examples/region-motion-demo.gif)
 
-克隆仓库并启动：
+An exported GIF at 1920 × 1080, 15 fps, and 12.4 seconds. [Download the original GIF](docs/examples/region-motion-demo.gif).
+
+## Run locally
+
+Requirements:
+
+- Python 3.11 or later.
+- Node.js 22 or later and npm.
+- FFmpeg on your `PATH`, or set `FFMPEG_PATH` to its executable. FFmpeg is required for MP4 and GIF export.
+
+Clone the repository and start the app:
 
 ```sh
 git clone https://github.com/XiesRay/region-motion.git
@@ -20,102 +29,113 @@ cd region-motion
 python3 scripts/start.py
 ```
 
-脚本首次会准备 npm 依赖、构建页面并检查 OpenCV。已有版本匹配的 Python 环境会直接复用，否则在本目录的 `.venv` 中安装 `scripts/requirements.txt`。首次准备依赖需要网络；准备完成后，图片处理与导出可以离线进行。
+On first run, the startup script installs npm dependencies, builds the frontend, and prepares OpenCV. It reuses a compatible Python environment if available; otherwise, it installs `scripts/requirements.txt` into `.venv` in this repository. Initial setup requires network access. After setup, local image processing and export work offline.
 
-启动成功后自动打开：
+The app opens at:
 
 ```text
 http://127.0.0.1:4317
 ```
 
-如果希望自己打开浏览器，运行 `python3 scripts/start.py --no-open`。端口被占用时，可指定其他端口，例如 `python3 scripts/start.py --port 4318`。
+To open the URL yourself, use `python3 scripts/start.py --no-open`. If the port is occupied, choose another port, for example `python3 scripts/start.py --port 4318`.
 
-## 先试双图案例
+## Try the two-image examples
 
-打开页面后，点击“先看双图演示”或左侧“载入双图案例演示”。两张图会被加入项目并自动框选，不需要先下载再上传，也不会覆盖已有画面。
+In the app, choose **Load two-image demo**. Both images are added and detected automatically without downloading them first. Existing work in the project is preserved.
 
-### 案例一：Mirami 功能介绍
+### Example 1: Mirami feature overview
 
-![案例一：Mirami 功能介绍](assets/app/public/examples/mirami-overview.png)
+![Mirami feature overview example](assets/app/public/examples/mirami-overview.png)
 
-这张图包含标题、四个功能卡片和底部说明。可以练习把每块内容分开框选，再安排它们依次出现。自动识别结果不符合讲解顺序时，直接拖动区域列表调整。
+This image contains a title, four feature cards, and a footer note. Practice selecting each part separately and arranging them in presentation order. Drag items in the region list if automatic detection does not match the order you want.
 
-### 案例二：一张照片，开启新的风格
+### Example 2: A photo, a new style
 
-![案例二：照片创作四步流程](assets/app/public/examples/mirami-photo-workflow.png)
+![Four-step photo creation example](assets/app/public/examples/mirami-photo-workflow.png)
 
-这张图适合练习四步流程：选风格 → 上传照片 → 生成作品 → 保存分享。调整卡片、文字和箭头的出现次序，点击播放检查，再导出循环 GIF 或 MP4。
+Use this image to practice arranging a four-step flow: choose a style → upload a photo → generate an image → save and share. Adjust the order of the cards, text, and arrows, preview the sequence, then export an animated GIF or MP4.
 
-左侧点击图片缩略图，可切换当前编辑画面。页面右上角“使用说明”也有完整操作步骤和案例预览。
+Select an image thumbnail on the left to switch the active canvas. The **Instructions** button in the upper-right corner also contains steps and example previews.
 
-## 实际操作
+## Editing workflow
 
-1. **上传图片**：点击左侧上传按钮，选择 PNG、JPEG 或 WebP。可一次选多张，每张图成为一个画面，上传后自动框选。
-2. **调整边界**：在右侧点选区域，再拖动画面上的蓝色控制点。矩形可分别拖动四条边；自由选区拖动某条边时，会同时移动这条边的两个端点。
-3. **补充与移动选区**：使用“矩形框选”或“自由圈选”补画；选择“选择 / 移动”后可移动整个区域。“隐藏区域”用于遮住不需要展示的内容。
-4. **拖动出现顺序**：按住右侧整条区域记录，上下拖动，到插入线位置后松开。无需先选中，也无需对准左侧手柄。上下箭头仍可单步调整。锁定区域不会被拖动；自动生成的“整图末位”按原项目规则固定在最后，手动补框插在它之前。
-5. **设置动画**：选择直接出现、淡入、轻弹、滑入或擦除；可以修改开始时间、持续时间和擦除方向。“自动排时”会按当前列表顺序重新安排动画。
-6. **播放预览**：点击画布下方“播放”，或按空格暂停／继续。拖动进度条可定位，按 Esc 返回编辑。100% 缩放自动适配窗口，放大时只在画布内部滚动。
-7. **导出成品**：在右上角选择 MP4 或 GIF，再点击导出。右上角按钮显示百分比，完成时显示 100%，并自动触发浏览器下载，不需要再点下载。下方“重新下载”只用于再次获取文件；保存位置由浏览器的下载设置决定。
-8. **保存编辑**：点击“保存项目”下载 JSON。下次用“打开项目”恢复图片、选区、动画和画面顺序。MP4／GIF 是成品，不包含后续编辑所需的完整项目数据。
+1. **Upload images:** Select PNG, JPEG, or WebP files with the upload button. You can select multiple images; each becomes a scene and is detected after upload.
+2. **Adjust boundaries:** Select a region on the right, then drag the blue handles on the canvas. Rectangle edges can be adjusted independently. Dragging a freeform edge moves both of its endpoints.
+3. **Add or move regions:** Use **Rectangle Select** or **Freeform Select** to add regions. Use **Select / Move** to move a whole region. **Hide Region** covers content that should not appear.
+4. **Arrange the sequence:** Drag a region row up or down in the right-hand list and release at the insertion line. You do not need to select the region or target its handle. The up and down arrows are also available. Locked regions cannot be dragged. The automatically generated **Full Image Last** region stays at the end; newly added regions are placed before it.
+5. **Set animation:** Choose instant, fade, pop, slide, or wipe. Adjust the start time, duration, and wipe direction. **Auto Schedule** recalculates timing in the current list order.
+6. **Preview:** Click **Play** below the canvas or press Space to pause or resume. Drag the progress bar to seek, and press Esc to return to editing. At 100% zoom the canvas fits the available area; when zoomed in, scrolling stays inside the canvas.
+7. **Export:** Choose MP4 or GIF in the upper-right corner and click **Export**. The button shows progress and the browser downloads the finished file automatically. Use **Download Again** only when you want another copy. The save location is controlled by your browser.
+8. **Save your project:** Click **Save Project** to download a JSON file. Later, use **Open Project** to restore the images, regions, animations, and scene order. MP4 and GIF files do not contain the editing data needed to continue a project.
 
-删除、清空和修改可以通过“撤销”恢复。快捷键：空格播放／暂停，Esc 返回编辑，Delete／Backspace 删除选中区域，⌘/Ctrl+Z 撤销，⌘/Ctrl+Shift+Z 重做。输入框内不会触发这些编辑快捷键。
+Edits can be undone, including deleting or clearing regions. Shortcuts: Space to play or pause, Esc to return to editing, Delete or Backspace to remove the selected region, ⌘/Ctrl+Z to undo, and ⌘/Ctrl+Shift+Z to redo. Editing shortcuts are disabled while typing in an input field.
 
-## 导出格式
+## Export formats
 
-| 格式 | 行为 | 适用场景 |
+Both formats use a fixed long edge of **1920 px**. There is no resolution selector. The aspect ratio follows the first image in the project; other images are scaled proportionally and centered with letterboxing.
+
+| Format | Output | Good for |
 | --- | --- | --- |
-| MP4 | H.264、30 fps，无声音轨 | 保存视频、演示或后续剪辑 |
-| GIF | 15 fps、循环播放，默认 720 px | 聊天、文档和网页中的循环动画 |
+| MP4 | H.264, 30 fps, no audio track | Video sharing, presentations, or further editing |
+| GIF | 15 fps, loops continuously | Chats, documents, and web pages |
 
-两种格式都保留区域动画和场景转场，长边可选择 720、1080 或 1920 px。画幅跟随第一张图片，其他图片等比居中留边。选择工作台浅色主题不会修改图片本身或导出的画面底色。
+Both formats include region animations and scene transitions. Choosing the light workspace theme does not change the source image or exported background. Each project can contain up to 30 images and 100 regions per image. Each image is limited to 20 MB and 40 megapixels; project JSON is limited to 80 MB; each export can be up to 10 minutes. Export creates standard PNG copies, which must also fit within the image limits.
 
-项目最多 30 张图片，每张 100 个区域；单张图片最多 20 MB、4000 万像素；项目 JSON 最多 80 MB；单次导出最长 10 分钟。导出时生成标准 PNG 副本，转换后的图片仍需满足容量上限。GIF 建议先用默认 720 px。
+## Automatic region detection
 
-## 自动框选说明
+Detection uses OpenCV through `scripts/opencv_object_boxer.py`, extracted from the original project, with a default filter threshold of 2. It is image processing, not AI image recognition, and does not require an AI key.
 
-自动框选直接使用从原项目提取的 `scripts/opencv_object_boxer.py`，默认过滤阈值为 2。它是本机 OpenCV 图像处理，不是模型识图，因此无需 AI Key。
+Whiteboard images and illustrations with uniform backgrounds and separated elements tend to work best. For photos, gradients, or overlapping elements, adjust the detected results manually. Leave **Target Content Region Count** empty to let detection estimate a count, or enter a desired count and run detection again. This value is a hint; it does not guarantee an exact number of regions.
 
-底色统一、元素之间有间隔的白板图和插画更容易识别。照片、渐变背景或元素重叠时，可在自动结果上手动调整。“目标内容区域数”留空时自动判断，也可以填写期望值后重新识别；它是提示，不保证严格等于返回数量。
+**Redetect Regions** replaces the regions for the current image. **Clear Regions** removes all regions from that image. Both actions can be undone. **Full Image Last** can reveal content that was not selected individually.
 
-“重新自动框选”替换当前图片的选区，“清空框选”移除当前图片的全部选区，两者都可以撤销。整图末位用于在最后补齐未单独框选的内容。
+## Local and hosted data handling
 
-## 文件与隐私
+In the local version, the browser sends images to the service on `127.0.0.1` on your computer for detection and export. Images and edits remain in the current browser page unless you save a project JSON file. There is no cloud sync.
 
-图片和选区保存在当前浏览器页面内；框选、导出时只发给 `127.0.0.1` 上的本机服务。关闭页面前请保存项目，工具不提供云同步。
+In the hosted version, region detection and export send the relevant images from your browser to the deployed server. The server processes them and returns the results. No AI key is required. Save the project JSON manually if you need to preserve or move your editable project; the hosted app does not provide cloud project sync.
 
-导出结果暂存在 `assets/app/.runtime/exports/`，任务完成后自动清理中间素材，只保留成品。服务重启后不恢复任务列表，已下载的成品和项目 JSON 不受影响。分发源码时不包含 `.runtime/`、`.venv/` 和 `node_modules/`。
+Export results are temporarily stored under `assets/app/.runtime/exports/`. Intermediate files are removed after a task completes, while the finished output is retained. The task list does not survive a service restart. Downloaded exports and project JSON files are unaffected. Do not include `.runtime/`, `.venv/`, or `node_modules/` in source distributions.
 
-## 安装为 Codex skill
+## Server deployment
 
-将整个目录放到 `~/.codex/skills/region-motion`，或将该路径链接到当前目录。重新打开 Codex 会话后，可以直接说：
+The hosted app is served at [https://www.jhstore.cn/region-motion/](https://www.jhstore.cn/region-motion/). The deployment uses Docker for the app and Nginx as a reverse proxy. Nginx forwards requests to the app at `127.0.0.1:4317` and serves it under `/region-motion/`.
 
-```text
-使用 $region-motion 打开本地图片动画工作台。
+From this Mac, run the repository deployment script:
+
+```sh
+scripts/deploy.sh
 ```
 
-skill 入口为 [SKILL.md](SKILL.md)，会启动同一套本地页面。
+The script builds the frontend locally, uploads the build with the server sources, and limits Docker build resources on the server. It reuses the existing Mirami SSH configuration script on this Mac for its connection settings. Credentials are not included in this repository or README. Do not copy connection credentials into project files.
 
-## 停止与开发
+## Install as a Codex skill
 
-停止本工具的本地服务：
+Place this directory at `~/.codex/skills/region-motion`, or link that path to this directory. Reopen the Codex session, then say:
+
+```text
+Use $region-motion to open the local image animation workspace.
+```
+
+The [SKILL.md](SKILL.md) entry point launches the same local app.
+
+## Stop and develop
+
+Stop the local service:
 
 ```sh
 python3 scripts/stop.py
 ```
 
-静态检查与构建：
+From `assets/app`, you can run type checking and build the frontend:
 
 ```sh
-cd assets/app
 npm run typecheck
 npm run build
 ```
 
-修改前端后构建并刷新页面。修改本机服务后，需要停止并重新运行启动脚本。项目保留了提取模块的纯函数测试源码；是否运行测试由使用者决定，文件存在不代表已经通过测试。
+After frontend changes, rebuild and refresh the page. After changing the local service, stop it and start it again. The repository includes source files for pure-function tests; their presence does not mean that the tests have passed. This README does not claim complete interaction or end-to-end verification, including export verification.
 
-当前版本已完成 TypeScript、前端构建、本地服务启动和页面资源检查，尚未完成全部交互及 MP4／GIF 导出的端到端验收。
+## License
 
-## 开源协议
-
-代码、文档和随附案例采用 [MIT License](LICENSE)。第三方依赖遵循各自许可证；Node.js、Python 和 FFmpeg 不随源码包分发。
+The code, documentation, and included examples are available under the [MIT License](LICENSE). Third-party dependencies have their own licenses. Node.js, Python, and FFmpeg are not bundled with the source.

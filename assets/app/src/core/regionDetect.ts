@@ -1851,7 +1851,7 @@ export async function autoDetectRegions(
   imageUrl: string,
   options: RegionDetectionOptions = {},
 ): Promise<DetectedRegion[]> {
-  const response = await fetch('/api/detect-regions', {
+  const response = await fetch('./api/detect-regions', {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({

@@ -17,6 +17,7 @@ const appDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const runtimeDir = path.join(appDir, '.runtime');
 const port = Number(process.env.REGION_MOTION_PORT || 4317);
 if (!Number.isInteger(port) || port < 1024 || port > 65535) throw new Error('端口必须在 1024 到 65535 之间');
+const publicOrigin = process.env.REGION_MOTION_PUBLIC_ORIGIN ? new URL(process.env.REGION_MOTION_PUBLIC_ORIGIN).origin : undefined;
 const execFileAsync = promisify(execFile);
 let ffmpegAvailable = false;
 try {await execFileAsync(resolveFfmpegPath(), ['-version'], {timeout: 5000}); ffmpegAvailable = true;} catch { /* 页面仍可编辑和预览。 */ }
@@ -36,10 +37,10 @@ const resultName = (job: Job) => job.format === 'gif' ? 'animation.gif' : 'video
 const app = express();
 app.disable('x-powered-by');
 app.use((req, res, next) => {
-  const allowedHosts = new Set([`127.0.0.1:${port}`, `localhost:${port}`]);
-  if (!allowedHosts.has(req.headers.host || '')) {res.status(403).json({error: '只允许本地访问'}); return;}
+  const allowedHosts = new Set([`127.0.0.1:${port}`, `localhost:${port}`, ...(publicOrigin ? [new URL(publicOrigin).host] : [])]);
+  if (!allowedHosts.has(req.headers.host || '')) {res.status(403).json({error: '访问主机不受支持'}); return;}
   const origin = req.headers.origin;
-  if (origin && ![`http://127.0.0.1:${port}`, `http://localhost:${port}`].includes(origin)) {
+  if (origin && ![`http://127.0.0.1:${port}`, `http://localhost:${port}`, publicOrigin].includes(origin)) {
     res.status(403).json({error: '拒绝跨站请求'}); return;
   }
   res.setHeader('X-Content-Type-Options', 'nosniff');
@@ -172,8 +173,7 @@ app.post('/api/exports', async (req, res) => {
     if (!project.scenes.length) throw new Error('请先上传图片');
     if (project.scenes.some((scene) => scene.width / scene.height < 0.1 || scene.width / scene.height > 10)) throw new Error('导出图片宽高比须在 1:10 到 10:1 之间');
     if (project.scenes.reduce((total, scene) => total + scene.duration, 0) > 600) throw new Error('单次导出最长 10 分钟，请拆分项目');
-    const size = Number(req.body.size);
-    if (![720, 1080, 1920].includes(size)) throw new Error('请选择 720、1080 或 1920 分辨率');
+    const size = 1920;
     const format = req.body.format ?? 'mp4';
     if (format !== 'mp4' && format !== 'gif') throw new Error('请选择 MP4 或 GIF 导出格式');
     const id = randomUUID();

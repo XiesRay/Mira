@@ -201,7 +201,7 @@ app.delete('/api/exports/:id', (req, res) => {
 app.get('/api/exports/:id/download', (req, res) => {
   const job = jobs.get(req.params.id);
   if (!job || job.status !== 'done') {res.status(404).json({error: '视频尚未完成或已过期'}); return;}
-  res.download(path.join(job.directory, resultName(job)), `region-motion.${job.format}`, (error) => {
+  res.download(path.join(job.directory, resultName(job)), `mira.${job.format}`, (error) => {
     if (error && !res.headersSent) res.status(404).json({error: '导出文件不存在，请重新导出'});
   });
 });
@@ -211,7 +211,7 @@ app.use((error: Error & {type?: string}, _req: express.Request, res: express.Res
   res.status(error.type === 'entity.too.large' ? 413 : 400).json({error: error.type === 'entity.too.large' ? '项目超过 80 MB' : '请求格式不正确'});
 });
 
-const server = app.listen(port, '127.0.0.1', () => console.log(`Region Motion ready: http://127.0.0.1:${port}`));
+const server = app.listen(port, '127.0.0.1', () => console.log(`Mira ready: http://127.0.0.1:${port}`));
 server.on('error', (error) => {console.error(error.message); process.exitCode = 1;});
 const prune = setInterval(() => {
   for (const [id, job] of jobs) {

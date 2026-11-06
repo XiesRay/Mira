@@ -40,7 +40,7 @@ export interface IllustrationScene {
 }
 
 export interface Project {
-  format: 'region-motion';
+  format: 'mira' | 'region-motion';
   version: 1;
   name: string;
   scenes: IllustrationScene[];

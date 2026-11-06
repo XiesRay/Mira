@@ -4,7 +4,7 @@ import {selectRegionMotion} from './sceneMotion';
 import {clamp, getPointsBounds, normalizeRect} from './utils';
 import type {IllustrationRegion, IllustrationScene, NormalizedPoint, NormalizedRect, Project} from './types';
 
-export const emptyProject = (): Project => ({format: 'region-motion', version: 1, name: '未命名项目', scenes: []});
+export const emptyProject = (): Project => ({format: 'mira', version: 1, name: '未命名项目', scenes: []});
 export const MAX_SCENES = 30;
 export const MAX_REGIONS = 100;
 export const MAX_PROJECT_BYTES = 80 * 1024 * 1024;
@@ -143,7 +143,7 @@ function parseRegion(value: unknown): IllustrationRegion {
 /** 只接收自包含本地素材，导入项目不会加载远程 URL。 */
 export function parseProject(value: unknown): Project {
   const raw = record(value);
-  if (raw.format !== 'region-motion' || raw.version !== 1) throw new Error('请选择 Region Motion v1 项目文件');
+  if (!['mira', 'region-motion'].includes(String(raw.format)) || raw.version !== 1) throw new Error('请选择 Mira 项目文件');
   const scenes = list(raw.scenes, MAX_SCENES).map((value): IllustrationScene => {
     const scene = record(value);
     const imageUrl = string(scene.imageUrl, 30_000_000);
@@ -159,7 +159,7 @@ export function parseProject(value: unknown): Project {
       regions: list(scene.regions, MAX_REGIONS).map(parseRegion),
     };
   });
-  return {format: 'region-motion', version: 1, name: string(raw.name), scenes: arrangeScenes(scenes)};
+  return {format: 'mira', version: 1, name: string(raw.name), scenes: arrangeScenes(scenes)};
 }
 
 export function downloadProject(project: Project): void {
@@ -169,7 +169,7 @@ export function downloadProject(project: Project): void {
   const url = URL.createObjectURL(blob);
   const anchor = document.createElement('a');
   anchor.href = url;
-  anchor.download = `${project.name.replace(/[^\p{L}\p{N}_-]/gu, '_').slice(0, 80) || 'project'}.region-motion.json`;
+  anchor.download = `${project.name.replace(/[^\p{L}\p{N}_-]/gu, '_').slice(0, 80) || 'project'}.mira.json`;
   anchor.click();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }

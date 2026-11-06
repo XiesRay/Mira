@@ -19,7 +19,7 @@ def health():
     with opener.open('http://127.0.0.1:4317/api/health', timeout=5) as response:
         result = json.load(response)
     if result.get('app') != 'region-motion' or not result.get('ffmpeg') or not result.get('opencv'):
-        raise RuntimeError('Region Motion dependencies are not ready')
+        raise RuntimeError('Mira dependencies are not ready')
 
 
 def main():
@@ -35,8 +35,23 @@ def main():
     original = site.read_text(encoding='utf-8')
     route = '''
     # REGION-MOTION-BEGIN
+    location = /mira {
+        return 301 https://www.jhstore.cn/mira/$is_args$args;
+    }
+    location ^~ /mira/ {
+        if ($scheme = http) { return 308 https://www.jhstore.cn$request_uri; }
+        client_max_body_size 80m;
+        proxy_pass http://127.0.0.1:4317/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Cookie "";
+        proxy_set_header Authorization "";
+        proxy_read_timeout 180s;
+        proxy_send_timeout 180s;
+        add_header Cache-Control "no-store" always;
+    }
     location = /region-motion {
-        return 301 https://www.jhstore.cn/region-motion/$is_args$args;
+        return 301 https://www.jhstore.cn/mira/$is_args$args;
     }
     location ^~ /region-motion/ {
         if ($scheme = http) { return 308 https://www.jhstore.cn$request_uri; }
@@ -56,7 +71,7 @@ def main():
         updated, count = re.subn(r'\n    # REGION-MOTION-BEGIN\n.*?    # REGION-MOTION-END\n',
                                  lambda _: route, original, flags=re.S)
         if count != 1:
-            raise RuntimeError('Ambiguous Region Motion Nginx markers')
+            raise RuntimeError('Ambiguous Mira Nginx markers')
     else:
         position = original.rfind('}')
         if position < 0:
@@ -97,7 +112,7 @@ def main():
             try:
                 run('curl', '--fail', '--silent', '--show-error', '--max-time', '20',
                     '--resolve', 'www.jhstore.cn:443:127.0.0.1',
-                    'https://www.jhstore.cn/region-motion/api/health')
+                    'https://www.jhstore.cn/mira/api/health')
                 break
             except subprocess.CalledProcessError:
                 if attempt == 9:
@@ -111,7 +126,7 @@ def main():
         if previous_image:
             start(previous_image)
         raise
-    print('\nReady: https://www.jhstore.cn/region-motion/')
+    print('\nReady: https://www.jhstore.cn/mira/')
 
 
 if __name__ == '__main__':

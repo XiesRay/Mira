@@ -1,20 +1,22 @@
 ---
-name: region-motion
+name: mira
 description: 打开图片区域动画工作台，支持在线体验或通过通用命令本地启动，上传图片后自动框选，支持手动修改选区、拖动安排出现顺序、预览播放及 MP4 或 GIF 导出。适用于把已有图片制作成逐步展示动画；不需要 AI Key。
 ---
 
-# Region Motion
+# Mira
 
 用随 skill 附带的页面完成图片上传、自动框选、手动编辑、播放和视频导出。工具不依赖特定 agent SDK 或厂商 API，本地模式不调用 Mcloub 的账号、数据库、生图接口或线上服务。当前范围不包含音频、字幕。
 
 ## 在线体验与跨 agent 使用
 
-- 在线体验：[https://www.jhstore.cn/region-motion/](https://www.jhstore.cn/region-motion/)。用户选择在线版时直接打开此地址；框选、导出会把相关图片发送到部署服务器，项目仍需手动保存 JSON。
-- 本地使用：任何能够读取文件、执行命令的 agent 都可按下文启动，不要求使用 `$region-motion` 等专属调用语法。支持 Skill 自动发现的工具，可把完整项目放入该工具规定的 skills 目录；其他工具直接读取本文件或执行启动命令。
+- 在线体验：[https://www.jhstore.cn/mira/](https://www.jhstore.cn/mira/)。用户选择在线版时直接打开此地址；框选、导出会把相关图片发送到部署服务器，项目仍需手动保存 JSON。
+- 本地使用：任何能够读取文件、执行命令的 agent 都可按下文启动，不要求使用 `$mira` 等专属调用语法。支持 Skill 自动发现的工具，可把完整项目放入该工具规定的 skills 目录；其他工具直接读取本文件或执行启动命令。
 - 保持 `SKILL.md`、`scripts/` 和 `assets/` 的相对目录结构。`agents/openai.yaml` 只是可选的工具界面元数据，其他 agent 可以忽略；浏览器工具也不是启动服务的前提。
 - 使用文档：[English](README.md) · [简体中文](README.zh-CN.md)。以下步骤适用于本地模式。
 
 ## 打开工作台
+
+只想使用工具时优先给出在线地址，用户不需要安装依赖。下载源码后，也可以双击 `Open Mira.html` 打开在线版；Mac 上双击 `Start Mira.command` 启动本地版。在线版会在服务器处理图片，本地版在用户自己的电脑上处理，由用户选择。
 
 将下方 `<skill-dir>` 替换为当前 `SKILL.md` 所在目录，路径包含空格时保留引号：
 
@@ -26,7 +28,7 @@ python3 "<skill-dir>/scripts/start.py" --no-open
 得到健康检查成功后的地址，再用可用的浏览器工具打开该地址；没有浏览器工具时，运行不带 `--no-open` 的同一脚本打开系统浏览器。
 端口被其他应用占用时使用 `--port 4318`，不要停止其他进程。
 
-依赖 Python 3.11 或更新版本、Node.js 22 或更新版本。启动脚本复用版本匹配的 OpenCV 环境，否则在 skill 自己的 `.venv` 中安装 `scripts/requirements.txt`，不修改系统 Python。可用 `OPENCV_PYTHON_BIN` 指定已配置的解释器。MP4 导出还需要 PATH 中的 FFmpeg，或者通过 `FFMPEG_PATH` 指定可执行文件。缺少 FFmpeg 不妨碍框选与预览，导出按钮会说明缺少依赖；不要自动修改系统软件。
+依赖 Python 3.11 或更新版本、Node.js 22.20 或更新版本。启动脚本复用版本匹配的 OpenCV 环境，否则在 skill 自己的 `.venv` 中安装 `scripts/requirements.txt`，不修改系统 Python。可用 `OPENCV_PYTHON_BIN` 指定已配置的解释器。MP4/GIF 导出还需要 PATH 中的 FFmpeg，或者通过 `FFMPEG_PATH` 指定可执行文件。缺少 FFmpeg 不妨碍框选与预览，导出按钮会说明缺少依赖；不要自动修改系统软件。
 首次安装依赖需要联网；安装完成后，工作台处理图片和导出视频不需要网络或 AI Key。
 
 ## 使用流程

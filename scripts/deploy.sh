@@ -84,4 +84,4 @@ rsync -a --exclude='/docs/' --exclude='.git' --exclude='.venv' --exclude='node_m
 ssh_run "mkdir -p '$remote_release'"
 rsync_push "$stage/" "$remote_release/"
 ssh_run "python3 '$remote_release/scripts/install-server.py'"
-printf 'Region Motion deployed: https://www.jhstore.cn/region-motion/\n'
+printf 'Mira deployed: https://www.jhstore.cn/mira/\n'

@@ -22,7 +22,6 @@ h3 {font-size: 12px; margin-bottom: 14px; color: #30332f;}
 .topbar {height: 76px; flex: 0 0 auto; padding: 0 24px; border-bottom: 1px solid #dedbd4; display: flex; align-items: center; gap: 24px; background: #fffefb;}
 .brand {display: flex; align-items: center; gap: 12px;}
 .brand-mark {letter-spacing: -7px; font-size: 38px; width: 43px; font-weight: 800; color: #34362f; padding-bottom: 7px;}
-.brand-mark span {color: #b65b32;}
 .brand strong {display: block; font-size: 16px; letter-spacing: -.4px;}
 .brand small {display: block; color: #74776b; font-size: 10px; margin-top: 5px;}
 .local-badge {padding: 5px 9px; font-size: 10px; border: 1px solid #d7ddca; color: #59684c; border-radius: 20px;}

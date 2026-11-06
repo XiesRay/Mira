@@ -73,10 +73,10 @@ def main():
     node = shutil.which("node")
     npm = shutil.which("npm")
     if not node or not npm:
-        raise RuntimeError("需要 Node.js 22 或更新版本及 npm")
-    major = int(subprocess.check_output([node, "--version"], text=True).strip().lstrip("v").split(".")[0])
-    if major < 22:
-        raise RuntimeError("需要 Node.js 22 或更新版本")
+        raise RuntimeError("本地版需要 Node.js 22.20 或更新版本及 npm；也可双击 Open Mira.html 使用在线版")
+    version = subprocess.check_output([node, "--version"], text=True).strip().lstrip("v").split(".")
+    if tuple(map(int, version[:2])) < (22, 20):
+        raise RuntimeError("本地版需要 Node.js 22.20 或更新版本；也可双击 Open Mira.html 使用在线版")
     runtime = APP_DIR / ".runtime"
     runtime.mkdir(exist_ok=True)
     url = f"http://127.0.0.1:{args.port}"

@@ -328,7 +328,7 @@ export default function App() {
     downloadedJobs.current.add(job.id);
     const link = document.createElement('a');
     link.href = `./api/exports/${job.id}/download`;
-    link.download = `region-motion.${job.format}`;
+    link.download = `mira.${job.format}`;
     document.body.append(link);
     link.click();
     link.remove();
@@ -359,7 +359,7 @@ export default function App() {
 
   return <div className="app-shell">
     <header className="topbar">
-      <div className="brand"><span className="brand-mark">r<span>m</span></span><div><strong>Region Motion</strong><small>图片框选与动画工作台</small></div></div>
+      <div className="brand"><span className="brand-mark">M</span><div><strong>Mira</strong><small>图片框选与动画工作台</small></div></div>
       <span className="local-badge">图片动画 · 无需 AI Key</span>
       <div className="header-actions">
         <button onClick={() => usageDialog.current?.showModal()}>使用说明</button>
@@ -442,7 +442,7 @@ export default function App() {
             const response = await fetch(`./api/exports/${job.id}`, {method: 'DELETE'});
             const result = await response.json(); if (!response.ok) throw new Error(result.error); setJob(result);
           })}>取消</button> : null}
-          {job.status === 'done' ? <><span>已自动触发下载</span><a href={`./api/exports/${job.id}/download`} download={`region-motion.${job.format}`}>重新下载</a></> : null}
+          {job.status === 'done' ? <><span>已自动触发下载</span><a href={`./api/exports/${job.id}/download`} download={`mira.${job.format}`}>重新下载</a></> : null}
           {job.error ? <span className="error-text">{job.error}</span> : null}
         </div> : null}
       </main>

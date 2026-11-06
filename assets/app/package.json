@@ -1,11 +1,11 @@
 {
-  "name": "region-motion",
+  "name": "mira",
   "version": "0.1.0",
   "private": true,
   "description": "Local image region selection, editing, playback and MP4 or GIF export.",
   "type": "module",
   "engines": {
-    "node": ">=22"
+    "node": ">=22.20"
   },
   "scripts": {
     "dev": "vite --host 127.0.0.1",

@@ -1,11 +1,14 @@
 # Region Motion
 
+**English** | [简体中文](README.zh-CN.md)
+
+### [Try Region Motion online →](https://www.jhstore.cn/region-motion/)
+
+No installation or AI key needed. [Mirami workbench](https://www.jhstore.cn/pc/workbench/studio/) · [Use with an AI agent](#use-with-any-ai-agent)
+
 Turn the contents of an image into an animation, one region at a time.
 
-Upload an image, detect regions automatically, refine their boundaries, arrange their order, preview the animation, and export an MP4 or GIF. The local version sends images only to the service on your own computer. The hosted version sends images to the deployed server for region detection and export. Neither version requires an AI key. You can also install this repository as a Codex skill and open the local workspace with `$region-motion`.
-
-- Hosted app: [https://www.jhstore.cn/region-motion/](https://www.jhstore.cn/region-motion/)
-- Mirami workbench: [https://www.jhstore.cn/pc/workbench/studio/](https://www.jhstore.cn/pc/workbench/studio/)
+Upload an image, detect regions automatically, refine their boundaries, arrange their order, preview the animation, and export an MP4 or GIF. The local version sends images only to the service on your own computer. The hosted version sends images to the deployed server for region detection and export. Neither version requires an AI key. The same app can run independently or be launched by any AI agent with filesystem and shell access. Agents that support `SKILL.md` can also load it as a skill.
 
 ## Exported demo
 
@@ -15,7 +18,7 @@ An exported GIF at 1920 × 1080, 15 fps, and 12.4 seconds. [Download the origina
 
 ## Run locally
 
-Requirements:
+The local launcher supports macOS and Linux. Requirements:
 
 - Python 3.11 or later.
 - Node.js 22 or later and npm.
@@ -109,15 +112,33 @@ scripts/deploy.sh
 
 The script builds the frontend locally, uploads the build with the server sources, and limits Docker build resources on the server. It reuses the existing Mirami SSH configuration script on this Mac for its connection settings. Credentials are not included in this repository or README. Do not copy connection credentials into project files.
 
-## Install as a Codex skill
+## Use with any AI agent
 
-Place this directory at `~/.codex/skills/region-motion`, or link that path to this directory. Reopen the Codex session, then say:
+Region Motion does not depend on an agent SDK, vendor API, or agent-specific launch command. Any agent with filesystem and shell access can start it using the same Python entry point. Browser control is optional: the agent can return the local URL for you to open yourself.
 
-```text
-Use $region-motion to open the local image animation workspace.
+### Install for your agent
+
+With Node.js 22.20 or later, use the [Skills CLI](https://github.com/vercel-labs/skills#install-a-skill):
+
+```sh
+npx skills add XiesRay/region-motion
 ```
 
-The [SKILL.md](SKILL.md) entry point launches the same local app.
+Follow the prompts to choose your agent. The installer covers its [supported agents](https://github.com/vercel-labs/skills/blob/main/docs/agents.md). For an agent outside that list, use the direct launch method below.
+
+### Launch from any checkout
+
+Give your agent this prompt, replacing the path with your checkout:
+
+```text
+Read /absolute/path/to/region-motion/SKILL.md.
+Run python3 /absolute/path/to/region-motion/scripts/start.py --no-open.
+Return the URL after the health check succeeds, and open it if a browser tool is available.
+```
+
+For agents with skill discovery, place the complete repository in that agent's documented skills directory under the name `region-motion`, then ask it to open Region Motion. For agents without skill discovery, ask the agent to read `SKILL.md` from your checkout or run the command directly. No special `$region-motion` invocation is required for the general workflow.
+
+Keep `SKILL.md`, `scripts/`, and `assets/` together so relative paths work. The optional `agents/openai.yaml` file supplies UI metadata for tools that recognize it; other agents can ignore it. Local runtime requirements are listed under [Run locally](#run-locally). You can also use the [online demo](https://www.jhstore.cn/region-motion/) directly from a browser without installing any agent.
 
 ## Stop and develop
 

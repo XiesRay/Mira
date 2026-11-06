@@ -1,0 +1,35 @@
+{
+  "name": "region-motion",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Local image region selection, editing, playback and MP4 or GIF export.",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "start": "node --import tsx server/index.ts",
+    "typecheck": "tsc --noEmit",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview --host 127.0.0.1",
+    "test": "node --import tsx --test tests/*.test.ts"
+  },
+  "dependencies": {
+    "@napi-rs/canvas": "0.1.100",
+    "express": "4.21.2",
+    "react": "19.0.0",
+    "react-dom": "19.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "22.14.0",
+    "@types/express": "4.17.21",
+    "@types/react": "19.2.10",
+    "@types/react-dom": "19.2.3",
+    "@vitejs/plugin-react": "5.0.4",
+    "tsx": "4.21.0",
+    "typescript": "5.8.3",
+    "vite": "6.2.0"
+  },
+  "license": "MIT"
+}

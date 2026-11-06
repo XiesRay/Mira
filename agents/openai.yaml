@@ -1,0 +1,4 @@
+interface:
+  display_name: "图片框选与动画"
+  short_description: "打开浅色本地页面，自动框选图片、拖动区域排序、预览动画并导出 MP4 或 GIF"
+  default_prompt: "使用 $region-motion 打开本地图片框选工作台，让我上传图片、编辑区域、预览并导出动画。"

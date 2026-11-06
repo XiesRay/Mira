@@ -1,0 +1,13 @@
+node_modules/
+dist/
+coverage/
+.runtime/
+.venv/
+__pycache__/
+*.py[cod]
+*.zip
+.DS_Store
+*.log
+.env*
+!.env.example
+*.region-motion.json
